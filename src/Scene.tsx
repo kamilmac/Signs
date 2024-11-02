@@ -2,6 +2,8 @@ import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { useRef, useEffect } from 'react'
 import * as THREE from 'three'
+import { SignMaterial, convertCharacterToGrid } from './SignMaterial'
+import { characters } from './signs'
 
 function Boxes() {
   const count = 800 // 80x10 grid
@@ -40,7 +42,11 @@ function Boxes() {
   return (
     <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="orange" />
+      <signMaterial 
+        characterGrid={convertCharacterToGrid(characters['A'])} 
+        color="#ff8800"
+        transparent
+      />
     </instancedMesh>
   )
 }
