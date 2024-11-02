@@ -5,49 +5,36 @@ import * as THREE from 'three'
 import { SignMaterial, convertCharacterToGrid } from './SignMaterial'
 import { characters } from './signs'
 
-function Boxes() {
-  const count = 800 // 80x10 grid
-  const mesh = useRef<THREE.InstancedMesh>(null!)
-  
-  useEffect(() => {
-    // Update instances
-    for (let i = 0; i < count; i++) {
-      const x = Math.floor(i / 10) - 40 // -40 to +39 for 80 columns
-      const z = (i % 10) - 5 // -5 to +4 for 10 rows
-      const position = new THREE.Vector3(
-        x * 1.2, // Space boxes slightly apart
-        0,
-        z * 1.2
-      )
-      const rotation = new THREE.Euler(
-        Math.random() * Math.PI,
-        Math.random() * Math.PI,
-        Math.random() * Math.PI
-      )
-      const scale = 0.5 + Math.random() * 0.5
-      
-      const matrix = new THREE.Matrix4()
-      matrix.compose(
-        position,
-        new THREE.Quaternion().setFromEuler(rotation),
-        new THREE.Vector3(scale, scale, scale)
-      )
-      
-      mesh.current.setMatrixAt(i, matrix)
-    }
-    // Need to flag the instanceMatrix as needs update
-    mesh.current.instanceMatrix.needsUpdate = true
-  }, [])
+interface BoxesProps {
+  text: string;
+}
+
+function Boxes({ text }: BoxesProps) {
+  const chars = text.split('')
+  const count = chars.length
+  const rowLength = Math.ceil(Math.sqrt(count)) // Make it roughly square
   
   return (
-    <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
-      <boxGeometry args={[1, 1, 1]} />
-      <signMaterial 
-        characterGrid={convertCharacterToGrid(characters['A'])} 
-        color="#ff8800"
-        transparent
-      />
-    </instancedMesh>
+    <group>
+      {chars.map((char, i) => {
+        const x = (i % rowLength) - rowLength/2 // Center the text
+        const z = Math.floor(i / rowLength) - Math.floor(count/rowLength)/2
+        
+        return (
+          <mesh
+            key={i}
+            position={[x * 1.5, 0, z * 1.5]}
+          >
+            <boxGeometry args={[1, 1, 1]} />
+            <signMaterial
+              characterGrid={convertCharacterToGrid(characters[char.toUpperCase()] || characters[' '])}
+              color="#ff8800"
+              transparent
+            />
+          </mesh>
+        )
+      })}
+    </group>
   )
 }
 
@@ -60,7 +47,7 @@ export function Scene() {
       <OrbitControls target={[0, 0, 0]} />
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
-      <Boxes />
+      <Boxes text="HELLO WORLD!" />
     </Canvas>
   )
 }
