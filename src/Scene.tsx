@@ -4,16 +4,18 @@ import { useRef, useEffect } from 'react'
 import * as THREE from 'three'
 
 function Boxes() {
-  const count = 100
+  const count = 800 // 80x10 grid
   const mesh = useRef<THREE.InstancedMesh>(null!)
   
   useEffect(() => {
     // Update instances
     for (let i = 0; i < count; i++) {
+      const x = Math.floor(i / 10) - 40 // -40 to +39 for 80 columns
+      const z = (i % 10) - 5 // -5 to +4 for 10 rows
       const position = new THREE.Vector3(
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10
+        x * 1.2, // Space boxes slightly apart
+        0,
+        z * 1.2
       )
       const rotation = new THREE.Euler(
         Math.random() * Math.PI,
@@ -46,7 +48,7 @@ function Boxes() {
 export function Scene() {
   return (
     <Canvas 
-      camera={{ position: [15, 15, 15], fov: 50 }}
+      camera={{ position: [0, 30, 50], fov: 50 }}
       style={{ width: '100%', height: '100%' }}
     >
       <OrbitControls target={[0, 0, 0]} />
